@@ -1,0 +1,19 @@
+http://localhost:3000/api/auth/signup
+
+{
+  "fullName": "Tilak Jain",
+  "email": "tilak@gmail.com",
+  "password": "tilak123",
+  "username": "tilak",
+  "upiId": "tilak@paytm",
+  "bio": "This is where you will get your future sort out",
+  "theme": "tomato",
+  "socialLinks": [{
+    "platform": "Instagram",
+    "url": "https://instagram.com/tilak"
+  },
+  {
+    "platform": "Github",
+    "url": "https://github.com/tilak"
+  }]
+}
