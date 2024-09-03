@@ -42,7 +42,7 @@ export async function POST(req) {
             name: newUser.name,
             email: newUser.email,
             username: newUser.username,
-        }), { status: 201 });
+        }), { status: 200 });
 
     } catch (error) {
         console.error('Error during signup:', error);

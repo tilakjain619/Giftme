@@ -1,16 +1,55 @@
-import Link from 'next/link'
-import React from 'react'
+'use client';
+
+import { useContext } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { AuthContext } from '@/context/AuthContext';
 
 const Navbar = () => {
-  return (
-    <nav className='px-3 py-2 sm:px-5 sm:py-3 flex justify-between items-center'>
-        <img className='w-28' src="./giftme_logo.svg" alt="Giftme Logo" />
-        <ul className='flex items-center gap-1'>
-            <li><Link className='hover:bg-gray-200 transition-all duration-100 rounded-full px-3 py-1' href="#">Login</Link></li>
-            <li className='bg-[#ed5a6b] text-white transition-all duration-100 rounded-full px-3 py-1'><Link href="#">Sign up</Link></li>
-        </ul>
-    </nav>
-  )
-}
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+  
+  const router = useRouter();
 
-export default Navbar
+  const handleLogout = async () => {
+    try {
+      await axios.post('/api/auth/logout');
+      setIsLoggedIn(false);
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  return (
+    <nav className="px-3 py-2 sm:px-5 sm:py-3 flex justify-between items-center">
+      <Link href={isLoggedIn ? "/dashboard" : "/"}><img className="w-28" src="./giftme_logo.svg" alt="Giftme Logo" /></Link>
+      <ul className="flex items-center gap-1">
+        {isLoggedIn ? (
+          <>
+            <li className="hover:bg-gray-200 transition-all duration-100 rounded-full px-4 py-1.5">
+              <Link href="/profile">Profile</Link>
+            </li>
+            <li
+              onClick={handleLogout}
+              className="bg-[#ed5a6b] hover:bg-[#f68e7e] text-white transition-all duration-100 rounded-full px-4 py-1.5 cursor-pointer"
+            >
+              Logout
+            </li>
+          </>
+        ) : (
+          <>
+            <li className="hover:bg-gray-200 transition-all duration-100 rounded-full px-4 py-1.5">
+              <Link href="/login">Login</Link>
+            </li>
+            <li className="bg-[#ed5a6b] hover:bg-[#f68e7e] text-white transition-all duration-100 rounded-full px-4 py-1.5">
+              <Link href="/signup">Sign up</Link>
+            </li>
+          </>
+        )}
+      </ul>
+    </nav>
+  );
+};
+
+export default Navbar;

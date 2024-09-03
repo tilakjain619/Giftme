@@ -29,7 +29,7 @@ export async function POST(req) {
 
     // Set JWT in a cookie
     const cookie = serialize('authToken', token, {
-      httpOnly: true,  // Makes the cookie inaccessible to JavaScript
+      // httpOnly: true,  // Makes the cookie inaccessible to JavaScript
       secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production
       maxAge: 60 * 60,  // 1 hour
       path: '/',  // Root path
@@ -43,7 +43,7 @@ export async function POST(req) {
     }), {
       status: 200,
       headers: {
-        'Set-Cookie': cookie,
+        'Set-Cookie': cookie
       },
     });
 
