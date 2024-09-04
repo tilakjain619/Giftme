@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const themes = ['Light', 'Dark', 'Colorful'];
@@ -6,6 +7,7 @@ const themes = ['Light', 'Dark', 'Colorful'];
 const SignupForm = () => {
   const [step, setStep] = useState(1);
   const [error, setError] = useState("");
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -46,16 +48,17 @@ const SignupForm = () => {
 
       if (response.status === 200) {
         // Redirect to the protected page or dashboard after successful signup
-        window.location.href = '/dashboard';
+        router.push('/login?msg=Thanks+for+signing+up,+please+login+to+proceed');
       }
     } catch (error) {
       // Handle errors (e.g., show an error message)
-      setError('Signup failed. Please try again.');
+      setError(error.response.data.error);
+      
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white shadow-md rounded">
+    <form onSubmit={handleSubmit} className="px-2 py-2 rounded">
       {error && (
         <div className="bg-red-100 text-red-700 p-2 rounded mb-4">
           {error}
@@ -70,7 +73,7 @@ const SignupForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 outline-none border border-gray-300 rounded mt-1"
               required
             />
           </div>
@@ -81,12 +84,12 @@ const SignupForm = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 border outline-none border-gray-300 rounded mt-1"
               required
             />
           </div>
           <div className="flex justify-between">
-            <button type="button" onClick={() => setStep(2)} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Next</button>
+            <button type="button" onClick={() => setStep(2)} className="bg-[#ed5a6b] text-white px-3 py-2 rounded hover:bg-[#f68e7e]">Next</button>
           </div>
         </>
       )}
@@ -100,7 +103,7 @@ const SignupForm = () => {
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 outline-none border border-gray-300 rounded mt-1"
               required
             />
           </div>
@@ -110,7 +113,7 @@ const SignupForm = () => {
               name="bio"
               value={formData.bio}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 outline-none border border-gray-300 rounded mt-1"
             />
           </div>
           <div className="mb-4">
@@ -124,7 +127,7 @@ const SignupForm = () => {
                     value={link.platform}
                     onChange={(e) => handleSocialLinkChange(index, e)}
                     placeholder="Platform"
-                    className="w-1/2 p-2 border border-gray-300 rounded mr-2"
+                    className="w-1/2 p-2 outline-none border border-gray-300 rounded mr-2"
                   />
                   <input
                     type="text"
@@ -132,13 +135,13 @@ const SignupForm = () => {
                     value={link.url}
                     onChange={(e) => handleSocialLinkChange(index, e)}
                     placeholder="URL"
-                    className="w-1/2 p-2 border border-gray-300 rounded mr-2"
+                    className="w-1/2 p-2 outline-none border border-gray-300 rounded mr-2"
                   />
                   <button type="button" onClick={() => removeSocialLink(index)} className="text-red-500">Remove</button>
                 </div>
               </div>
             ))}
-            <button type="button" onClick={addSocialLink} className="text-blue-500">+ Add another link</button>
+            <button type="button" onClick={addSocialLink} className="text-[#ed5a6b]">+ Add another link</button>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Theme</label>
@@ -146,7 +149,7 @@ const SignupForm = () => {
               name="theme"
               value={formData.theme}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 border outline-none border-gray-300 rounded mt-1"
               required
             >
               {themes.map((theme) => (
@@ -155,8 +158,8 @@ const SignupForm = () => {
             </select>
           </div>
           <div className="flex justify-between">
-            <button type="button" onClick={() => setStep(1)} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Back</button>
-            <button type="button" onClick={() => setStep(3)} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Next</button>
+            <button type="button" onClick={() => setStep(1)} className="bg-gray-500 text-white px-3 py-2 transition-all duration-100 rounded hover:bg-gray-600">Back</button>
+            <button type="button" onClick={() => setStep(3)} className="bg-[#ed5a6b] text-white px-3 py-2 rounded transition-all duration-100 hover:bg-[#f68e7e]">Next</button>
           </div>
         </>
       )}
@@ -170,7 +173,7 @@ const SignupForm = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 outline-none border border-gray-300 rounded mt-1"
               required
             />
           </div>
@@ -181,13 +184,13 @@ const SignupForm = () => {
               name="upiId"
               value={formData.upiId}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 outline-none border border-gray-300 rounded mt-1"
               required
             />
           </div>
           <div className="flex justify-between">
-            <button type="button" onClick={() => setStep(2)} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Back</button>
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Submit</button>
+            <button type="button" onClick={() => setStep(2)} className="bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600">Back</button>
+            <button type="submit" className="bg-[#ed5a6b] text-white px-3 py-2 rounded hover:bg-[#f68e7e]">Sign up</button>
           </div>
         </>
       )}

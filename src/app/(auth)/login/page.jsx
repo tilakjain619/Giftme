@@ -1,7 +1,7 @@
 'use client'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthContext } from '@/context/AuthContext';
 import FlickeringGrid from "@/components/magicui/flickering-grid";
 import Link from 'next/link';
@@ -10,6 +10,9 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loginMessage, setLoginMessage] = useState("");
+    const params = useSearchParams();
+
     const router = useRouter();
     const { setIsLoggedIn } = useContext(AuthContext);  // Use context
     const handleLogin = async (e) => {
@@ -30,6 +33,9 @@ const Login = () => {
             setError('Invalid email or password');
         }
     };
+    useEffect(()=>{
+        setLoginMessage(params.get('msg'))
+    }, [])
     return (
         <div className="flex items-center px-3 justify-center min-h-[80vh]">
             <FlickeringGrid
@@ -41,10 +47,15 @@ const Login = () => {
                 flickerChance={0.1}
             />
             <div className="bg-white border-2 border-[#ffecd1] p-8 rounded-md shadow-lg shadow-slate-200 w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">Welcome back</h2>
                 {error && (
                     <div className="bg-red-100 text-red-700 p-2 rounded mb-4">
                         {error}
+                    </div>
+                )}
+                {loginMessage && (
+                    <div className="bg-green-100 text-zinc-700 p-2 rounded mb-4">
+                        {loginMessage}
                     </div>
                 )}
                 <form onSubmit={handleLogin}>
