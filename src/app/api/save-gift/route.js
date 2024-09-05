@@ -1,29 +1,28 @@
-// pages/api/save-supporter.js
-
 import dbConnect from '@/utils/dbConnect';
 import Supporter from '@/models/Supporter';
+import { NextResponse } from 'next/server';
 
-export default async function POST(req, res) {
+export async function POST(req) {
     await dbConnect();
 
-    const { amount, userId, senderName, senderEmail, message, isPrivate, paymentStatus, stripePaymentId } = req.body;
-
     try {
-      const supporter = new Supporter({
-        userId,
-        amount,
-        senderName,
-        senderEmail,
-        message,
-        isPrivate,
-        paymentStatus,
-        stripePaymentId,
-      });
+        const { amount, userId, senderName, senderEmail, message, isPrivate, paymentStatus, stripePaymentId } = await req.json();
 
-      await supporter.save();
+        const supporter = new Supporter({
+            userId,
+            amount,
+            senderName,
+            senderEmail,
+            message,
+            isPrivate,
+            paymentStatus,
+            stripePaymentId,
+        });
 
-      res.status(200).json({ message: 'Supporter record saved successfully' });
+        await supporter.save();
+
+        return NextResponse.json({ message: 'Supporter record saved successfully' }, { status: 200 });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

@@ -21,7 +21,10 @@ export default function ProfilePage({ params }) {
   const [message, setMessage] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [paymentReady, setPaymentReady] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [recentGifts, setRecentGifts] = useState([]);
 
+  // Fetch profile data based on username
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -37,6 +40,33 @@ export default function ProfilePage({ params }) {
     fetchProfile();
   }, [username]);
 
+  const fetchPublicGifts = async (userId) => {
+    try {
+      const response = await axios.get(`/api/gifts/${userId}`);
+      const data = response.data;
+      if (data.success) {
+        return data.gifts;
+
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching public gifts:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    if (profile?._id) {
+      const getGifts = async () => {
+        const fetchedGifts = await fetchPublicGifts(profile._id);
+        setRecentGifts(fetchedGifts);
+      };
+
+      getGifts();
+
+    }
+  }, [profile?._id]);
   const handleAmountChange = (amt) => {
     setAmount(amt);
   };
@@ -57,6 +87,7 @@ export default function ProfilePage({ params }) {
     }
   };
 
+  // Create a payment intent when the user clicks on the "Gift" button
   const createPaymentIntent = async () => {
     try {
       const response = await axios.post('/api/create-gift', {
@@ -71,6 +102,24 @@ export default function ProfilePage({ params }) {
       setPaymentReady(true);
     } catch (error) {
       setError('Failed to initialize payment');
+    }
+  };
+
+  // Save gift to DB after payment success
+  const saveGiftToDB = async () => {
+    try {
+      const response = await axios.post('/api/save-gift', {
+        amount,
+        userId: profile._id,
+        senderName,
+        senderEmail,
+        message,
+        isPrivate,
+      });
+      console.log('Gift saved to DB:', response.data);
+    } catch (error) {
+      console.error('Failed to save gift to DB:', error);
+      setError('Failed to save gift after successful payment.');
     }
   };
 
@@ -95,15 +144,16 @@ export default function ProfilePage({ params }) {
         <div className='grid w-full mb-10 gap-2 bg-white user-bg-shadow rounded-lg px-5 py-6'>
           <div>
             <ul className='flex items-center border bg-zinc-100 rounded-2xl py-2 px-3 border-zinc-200 gap-1 justify-center'>
-              <li onClick={() => handleAmountChange(100)} className='text-xs font-semibold text-[#ed5a6b] border border-zinc-200 cursor-pointer w-10 h-10 grid items-center bg-white px-3 rounded-full justify-center'>100</li>
-              <li onClick={() => handleAmountChange(500)} className='text-xs font-semibold text-[#ed5a6b] border border-zinc-200 cursor-pointer w-10 h-10 grid items-center bg-white px-3 rounded-full justify-center'>500</li>
-              <li onClick={() => handleAmountChange(1000)} className='text-xs font-semibold text-[#ed5a6b] border border-zinc-200 cursor-pointer w-10 h-10 grid items-center bg-white px-3 rounded-full justify-center'>1000</li>
+              <li onClick={() => handleAmountChange(100)} className={`text-xs font-semibold text-[#ed5a6b] border border-zinc-200 cursor-pointer w-10 h-10 grid items-center bg-white px-3 rounded-full justify-center ${amount === 100 ? 'border-[#ed5a6b]' : 'border-zinc-200'}`}>100</li>
+              <li onClick={() => handleAmountChange(500)} className={`text-xs font-semibold text-[#ed5a6b] border border-zinc-200 cursor-pointer w-10 h-10 grid items-center bg-white px-3 rounded-full justify-center ${amount === 500 ? 'border-[#ed5a6b]' : 'border-zinc-200'}`}>500</li>
+              <li onClick={() => handleAmountChange(1000)} className={`text-xs font-semibold text-[#ed5a6b] border border-zinc-200 cursor-pointer w-10 h-10 grid items-center bg-white px-3 rounded-full justify-center ${amount === 1000 ? 'border-[#ed5a6b]' : 'border-zinc-200'}`}>1000</li>
               <li><input min={100} max={10000} className='w-10 invalid:border-red-400 text-xs px-2 h-10 rounded-md border border-zinc-200 outline-none bg-white' type="number" onChange={(e) => handleAmountChange(e.target.value)} placeholder='Custom' /></li>
             </ul>
           </div>
           <input
             className='bg-zinc-100 w-full sm:min-w-72 px-3 py-3 outline-none rounded-2xl'
             type="text"
+            required
             placeholder='Name or @yoursocial'
             value={senderName}
             onChange={(e) => setSenderName(e.target.value)}
@@ -111,6 +161,7 @@ export default function ProfilePage({ params }) {
           <input
             className='bg-zinc-100 w-full sm:min-w-72 px-3 py-3 outline-none rounded-2xl'
             type="email"
+            required
             placeholder='Your email'
             value={senderEmail}
             onChange={(e) => setSenderEmail(e.target.value)}
@@ -130,29 +181,35 @@ export default function ProfilePage({ params }) {
             <span className='ml-2'>Keep this gift private</span>
           </label>
 
-          {
-            !paymentReady && <button
-            onClick={createPaymentIntent}
-            className="bg-[#ed5a6b] w-full hover:bg-[#f68e7e] text-white font-semibold py-3 px-8 rounded-full"
-          >
-            Gift ₹{amount}
-          </button>
-          }
+          {!paymentReady && (
+            <button
+              onClick={createPaymentIntent}
+              className="bg-[#ed5a6b] w-full hover:bg-[#f68e7e] text-white font-semibold py-3 px-8 rounded-full"
+            >
+              Gift ₹{amount}
+            </button>
+          )}
 
           {paymentReady && (
             <Elements stripe={stripePromise}>
-              <CheckoutForm amount={amount} clientSecret={clientSecret} />
+              <CheckoutForm
+                amount={amount}
+                clientSecret={clientSecret}
+                saveGiftToDB={saveGiftToDB}
+              />
             </Elements>
           )}
         </div>
-        {
-          profile.bio && <div className='text-left bg-[#eeeeeeeb] px-5 py-4 rounded-md'>
+
+        {profile.bio && (
+          <div className='text-left bg-[#eeeeeeeb] px-5 py-4 rounded-2xl'>
             <h3 className='font-semibold'>About {profile.fullName}</h3>
-            <p className='text-gray-800 mt-1'>{profile.bio}</p></div>
-        }
-        {
-          profile.socialLinks.length > 1 &&
-          <ul className='flex gap-2 justify-center items-center'>
+            <p className='text-gray-800 mt-1'>{profile.bio}</p>
+          </div>
+        )}
+
+        {profile.socialLinks.length > 1 && (
+          <ul className='flex gap-2 justify-center text-zinc-700 text-sm items-center'>
             {profile.socialLinks.map((link) => {
               const fullUrl = link.url.startsWith('http://') || link.url.startsWith('https://')
                 ? link.url
@@ -163,16 +220,29 @@ export default function ProfilePage({ params }) {
                     {link.platform}
                   </Link>
                 </li>
-              )
+              );
             })}
           </ul>
-        }
+        )}
+      </div>
+      <div className='grid gap-2 px-3 py-2'>
+        <h2 className='text-center text-lg md:text-2xl font-bold text-zinc-700 my-3 md:my-5'>Recent supporters 💖</h2>
+        {/* Render gifts or any other component logic */}
+        {recentGifts.length > 0 ? (
+          recentGifts.map(gift =>
+            <div key={gift._id} className='bg-[#ed5a6b] px-5 py-4 rounded-2xl text-white'>
+              <h2 className='flex items-center gap-1'><span className='font-semibold'>{gift.senderName}</span> <span className='text-sm text-[#ffecd1]'>gifted <span>₹{gift.amount}</span></span></h2>
+              <p className='text-sm mt-1 text-zinc-100'>{gift.message}</p>
+            </div>)
+        ) : (
+          <p className='px-2 py-3 text-center'>Be the first to Gift <span className='animate-pulse'>🩵</span></p>
+        )}
       </div>
     </div>
   );
 }
 
-function CheckoutForm({ amount, clientSecret }) {
+function CheckoutForm({ amount, clientSecret, saveGiftToDB }) {
   const stripe = useStripe();
   const elements = useElements();
   const [paymentError, setPaymentError] = useState(null);
@@ -198,17 +268,22 @@ function CheckoutForm({ amount, clientSecret }) {
     } else if (paymentIntent.status === 'succeeded') {
       setPaymentSuccess(true);
       setPaymentError(null);
+      await saveGiftToDB(); // Save gift after successful payment
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <CardElement />
-      <button type="submit" disabled={!stripe || !clientSecret} className='mt-4 w-full sm:min-w-72 rounded-2xl bg-blue-500 text-white py-2'>
+      <button
+        type="submit"
+        disabled={!stripe || !clientSecret}
+        className='mt-4 w-full sm:min-w-72 rounded-2xl bg-blue-500 text-white py-2'
+      >
         Pay ₹{amount}
       </button>
       {paymentError && <div className="text-red-600 mt-2">{paymentError}</div>}
-      {paymentSuccess && <div className="text-green-600 mt-2">Payment Successful!</div>}
+      {paymentSuccess && <div className="text-green-600 mt-2">Your gift was received ❤️</div>}
     </form>
   );
 }
