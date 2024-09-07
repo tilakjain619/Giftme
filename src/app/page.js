@@ -20,6 +20,12 @@ export default function Home() {
           className="font-display text-center text-5xl font-bold tracking-[-0.02em] text-zinc-700 drop-shadow-sm md:text-7xl md:leading-[5rem]"
         />
       </section>
+      <div className="mt-16 grid gap-3 md:mt-20 py-4 justify-center">
+        <h2 className="uppercase text-center text-zinc-700 font-semibold">Receive Gifts</h2>
+        <h1 className="text-2xl font-semibold sm:text-4xl lg:text-6xl text-zinc-800">Give your audience an easy way to say thanks</h1>
+        <p className="text-sm text-zinc-700 sm:text-lg max-w-[700px] mx-auto md:mt-4">Supporting you has never been this fun and easy! With just a couple of taps, your fans can send you a gift and leave a heartfelt message.</p>
+        <img className="w-full mt-2 sm:w-[300px] md:w-[400px] mx-auto -skew-y-3 skew-x-3 shadow-2xl shadow-zinc-400 rounded-3xl" src="https://res.cloudinary.com/da3wjnlzg/image/upload/f_auto,q_auto/v1/Giftme/deuoawelj4or1ecuqwui" alt="Payment UI Screenshot"/>
+      </div>
     </div>
   );
 }

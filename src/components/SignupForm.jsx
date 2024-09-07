@@ -16,7 +16,8 @@ const SignupForm = () => {
     socialLinks: [{ platform: '', url: '' }], // Initialize with one empty object
     theme: themes[0],
     username: '',
-    upiId: ''
+    upiId: '',
+    walletAmount: 0
   });
 
   const handleChange = (e) => {

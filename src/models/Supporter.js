@@ -23,6 +23,10 @@ const SupporterSchema = new mongoose.Schema({
   senderEmail: {
     type: String
   },
+  paymentStatus: {
+    type: String,
+    required: true, // Stripe payment status (e.g., succeeded, pending, etc.)
+  },
   stripePaymentId:{
     type: String
   },

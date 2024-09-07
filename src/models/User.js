@@ -4,7 +4,8 @@ const UserSchema = new mongoose.Schema({
     email:{
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        match: [/.+\@.+\..+/, 'Please enter a valid email address']
     },
     password:{
         type: String,
@@ -27,7 +28,14 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    upiId: String,
+    upiId: {
+        type: String,
+        match: [/^[\w.-]+@[\w.-]+$/, 'Please enter a valid UPI ID']
+    },
+    walletAmount:{
+        type: Number,
+        default: 0
+    },
 }, {
     timestamps: true
 })

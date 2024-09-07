@@ -34,7 +34,8 @@ export async function POST(req) {
             bio,
             theme,
             socialLinks,
-            upiId
+            upiId,
+            walletAmount: 0
         });
         // Respond with the created user (excluding the password)
         return new Response(JSON.stringify({

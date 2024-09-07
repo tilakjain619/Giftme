@@ -1,3 +1,4 @@
+// app/layout.js or app/RootLayout.js (depending on your setup)
 import { Poppins } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
@@ -15,8 +16,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={poppins.className}>
         <AuthProvider>
-          <Navbar />
-          <main className="md:max-w-[80%] lg:max-w-[65%] mx-auto">{children}</main>
+          
+            <Navbar />
+            <main className="md:max-w-[80%] lg:max-w-[65%] mx-auto">
+              {children}
+            </main>
         </AuthProvider>
       </body>
     </html>
