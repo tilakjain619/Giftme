@@ -1,18 +1,20 @@
-'use client'
+'use client';
 import { useUser } from '@/context/UserContext';
 import Loader from '@/components/Loader';
 import axios from 'axios';
-
-
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import WithdrawForm from '@/components/WithdrawForm';
 
 const Dashboard = () => {
-  const { user, loading } = useUser();  
+  const { user, loading } = useUser();
   const [recentGifts, setRecentGifts] = useState([]);
   const [totalGifts, setTotalGifts] = useState(0);
+  const [withdrawRequested, setWithdrawRequested] = useState(false);
+  const [showWithdrawForm, setShowWithdrawForm] = useState(false);
   const [error, setError] = useState('');
-  
 
+  // Hook to fetch recent gifts
   useEffect(() => {
     if (user) {
       const fetchRecentGifts = async () => {
@@ -29,17 +31,40 @@ const Dashboard = () => {
     }
   }, [user]);
 
+  // Hook to check withdrawal status
+  useEffect(() => {
+    const checkWithdrawalStatus = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(`/api/withdraw-request/status?email=${user.email}`);
+          if (response.data.exists) {
+            setWithdrawRequested(true);
+          }
+        } catch (error) {
+          console.error('Failed to check withdrawal status:', error);
+        }
+      }
+    };
+
+    checkWithdrawalStatus();
+  }, [user]);
+
+  // Handle withdraw request
+  const handleWithdrawRequest = () => {
+    setShowWithdrawForm(true);
+  };
+
+  const closeWithdrawForm = () => {
+    setShowWithdrawForm(false);
+  };
+
+  // Ensure hooks are declared first before any early return
   if (loading) {
     return <Loader />;
   }
 
   if (error) {
     return <div className='text-lg py-3 px-4'>{error}</div>;
-  }
-
-  const handleWithdrawRequest = () =>{
-   console.log("Withdraw Button clicked");
-   
   }
 
   return (
@@ -49,19 +74,20 @@ const Dashboard = () => {
       {/* Wallet Summary */}
       <div className="flex  flex-wrap justify-between items-center gap-2 bg-[#ed5a6b] text-white shadow-lg shadow-zinc-200 rounded-lg p-4">
         <div>
-        <h2 className="text-xl font-semibold">Wallet</h2>
-        <p className="text-lg">Balance: ₹{user.walletAmount}</p>
+          <h2 className="text-xl font-semibold">Wallet</h2>
+          <p className="text-lg">Balance: ₹{user.walletAmount}</p>
         </div>
         <div>
-          <button onClick={handleWithdrawRequest} className='flex items-center bg-white hover:bg-opacity-70 text-zinc-700 px-4 py-3 rounded-lg gap-1'>
-            Request Withdrawal
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={16} height={16} fill={"none"}>
-    <path d="M3.3457 16.1976L16.1747 3.36866M18.6316 11.0556L16.4321 13.2551M14.5549 15.1099L13.5762 16.0886" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M3.17467 16.1411C1.60844 14.5749 1.60844 12.0355 3.17467 10.4693L10.4693 3.17467C12.0355 1.60844 14.5749 1.60844 16.1411 3.17467L20.8253 7.85891C22.3916 9.42514 22.3916 11.9645 20.8253 13.5307L13.5307 20.8253C11.9645 22.3916 9.42514 22.3916 7.85891 20.8253L3.17467 16.1411Z" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M4 22H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-</svg>
+          <button onClick={handleWithdrawRequest} disabled={withdrawRequested} className='flex items-center bg-white hover:bg-opacity-70 disabled:bg-opacity-70 text-zinc-700 px-4 py-3 rounded-lg gap-1'>
+            {withdrawRequested ? "Withdrawal Requested" : "Request Withdrawal"}
           </button>
         </div>
+        {showWithdrawForm && <div className='fixed inset-0 flex items-center justify-center z-20'>
+    <div className='relative w-[90%] min-h-[90vh] max-w-[600px] grid items-center'>
+      <WithdrawForm onClose={closeWithdrawForm} />
+    </div>
+    <div className='bg-black bg-opacity-50 fixed inset-0 -z-10'></div>
+  </div> }
       </div>
 
       {/* Gift Summary */}
@@ -79,7 +105,7 @@ const Dashboard = () => {
               <li key={gift._id} className=" bg-[#fcbd8d] px-4 py-3 rounded-lg">
                 <h2 className='flex items-center gap-1'><span className='font-semibold text-zinc-800'>{gift.senderName ? gift.senderName : "Someone"}</span> <span className='text-sm text-zinc-800'>gifted <span>₹{gift.amount}</span></span></h2>
                 {gift.message && <p className='text-sm mt-1 text-zinc-700'>{gift.message}</p>}
-                {gift.senderEmail && <p className='text-sm mt-1 text-zinc-700'>Email: {gift.senderEmail}</p>}
+                {gift.senderEmail && <p className='text-sm mt-1 text-zinc-700'>Say thanks: <Link href={`mailto:${gift.senderEmail}`}>{gift.senderEmail}</Link></p>}
               </li>
             ))
           ) : (

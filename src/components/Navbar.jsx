@@ -27,9 +27,9 @@ const Navbar = () => {
       <ul className="flex items-center gap-1">
         {isLoggedIn ? (
           <>
-            <li className="hover:bg-gray-200 transition-all duration-100 rounded-full px-4 py-1.5">
+            {/* <li className="hover:bg-gray-200 transition-all duration-100 rounded-full px-4 py-1.5">
               <Link href="/profile">Profile</Link>
-            </li>
+            </li> */}
             <li
               onClick={handleLogout}
               className="bg-[#ed5a6b] hover:bg-[#f68e7e] text-white transition-all duration-100 rounded-full px-4 py-1.5 cursor-pointer"

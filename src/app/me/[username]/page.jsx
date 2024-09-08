@@ -166,7 +166,7 @@ export default function ProfilePage({ params }) {
   }
   return (
     <div className={`flex flex-col max-w-[600px] lg:max-w-full lg:flex-row mx-auto items-center lg:items-start justify-center min-h-[90vh]`}>
-      <div className='grid px-3 relative py-2 gap-4 text-center'>
+      <div className='grid lg:w-3/5 px-3 relative py-2 gap-4 text-center'>
         <h1 className='text-lg font-bold lg:text-2xl'>{profile.fullName}</h1>
         <div title="Share this profile" className='absolute text-zinc-600 top-3 right-8'>
           <svg className='cursor-pointer' onClick={handleShare} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={20} height={20} fill={"none"}>
@@ -244,7 +244,7 @@ export default function ProfilePage({ params }) {
         </div>
 
         {profile.bio && (
-          <div className='text-left bg-zinc-300 px-5 py-4 rounded-2xl'>
+          <div className='text-left bg-zinc-200 px-5 py-4 rounded-2xl'>
             <h3 className='font-semibold'>About {profile.fullName}</h3>
             <p className='text-gray-800 mt-1'>{profile.bio}</p>
           </div>
@@ -267,7 +267,7 @@ export default function ProfilePage({ params }) {
           </ul>
         )}
       </div>
-      <div className='grid gap-2 px-3 py-2'>
+      <div className='grid lg:w-2/5 gap-2 px-3 py-2'>
         <h2 className='text-center text-lg md:text-2xl font-bold text-zinc-700 my-3 md:my-5 lg:my-0 lg:mb-3 lg:text-lg'>Recent supporters 💖</h2>
         {/* Render gifts or any other component logic */}
         {recentGifts.length > 0 ? (

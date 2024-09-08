@@ -3,6 +3,7 @@ import { Poppins } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import { AuthProvider } from '@/context/AuthContext';
+import Footer from '@/components/Footer';
 
 const poppins = Poppins({ subsets: ['latin'], weight: '400' });
 
@@ -21,6 +22,8 @@ export default function RootLayout({ children }) {
             <main className="md:max-w-[80%] lg:max-w-[65%] mx-auto">
               {children}
             </main>
+
+            <Footer/>
         </AuthProvider>
       </body>
     </html>
