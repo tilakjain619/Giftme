@@ -60,14 +60,15 @@ npm run dev
 ### Folder Structure
 ```bash
 .
+├── public        # Static assets
 ├── src
 │   ├── components    # Reusable UI components
 │   ├── app           # Next.js routes
-│   ├── public        # Static assets
 │   ├── styles        # Global and component-specific styles
 │   ├── utils         # Utility functions 
-│   ├── api           # API Routes 
+│   ├── lib           # Predefined config functions
 │   ├── context       # Context API setup for global state
+│   ├── models        # Defined schemas for db collections
 └── .env              # Environment variables
 ```
 ## Contributing
